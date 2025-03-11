@@ -1,0 +1,86 @@
+Indonesian Code Party 2015-2025
+==========================================================
+Title: Covering Track, Wanna be a ghost on a Linux server.
+by: laggerghost (koeltoer@proton.me)
+==========================================================
+
+Perhatian :
+-----------
+1) Artikel ini dibuat hanya untuk tujuan edukasi.
+2) Penulis tidak bertanggung jawab atas penyalahgunaan informasi ini untuk aktivitas ilegal atau hacking yang melanggar hukum.
+---------------------------------------------------------------------------------
+
+Latar belakang :
+----------------
+1) Memahami bagaimana penyerang menyembunyikan jejaknya.
+2) Lebih siap dalam mendeteksi aktivitas mencurigakan serta menerapkan langkah-langkah pencegahan yang efektif.
+
+
+Apa itu Covering Track ?
+------------------------
+Covering Track adalah teknik untuk menyembunyikan atau menghapus jejak
+setelah mengakses atau menyerang sebuah server. Teknik ini biasanya digunakan
+untuk menghindari deteksi oleh administrator sistem.
+
+=======================================
+Menghapus atau Mengalihkan Bash History
+=======================================
+
+Linux mencatat semua perintah yang diketik oleh pengguna
+di dalam file .bash_history. Untuk menghindari pencatatan ini:
+
+Mengalihkan pencatatan history ke /dev/null:
+HISTFILE=/dev/null
+
+Menghapus history secara manual:
+history -c
+
+=============================
+Menghapus Jejak dari Log File
+=============================
+
+Log file sering menyimpan informasi login dan aktivitas pengguna.
+Untuk mencari log yang mencatat IP kita:
+grep -Rn 'YOUR IP' /var/log/ 2> /dev/null
+
+Untuk mengedit log tanpa menghapusnya secara langsung:
+sed 's/YOUR IP/FAKE IP/g' file_log
+
+=====================
+Manipulasi Log Sistem
+=====================
+
+WTMP: Mencatat login/logoff pengguna.
+UTMP: Menyimpan daftar pengguna yang sedang aktif.
+Lastlog: Merekam alamat IP terakhir yang digunakan untuk login.
+
+Menghapus jejak dari log ini bisa dilakukan dengan tool seperti Uzapper:
+
+Download dari: https://packetstormsecurity.com/files/16378/uzapper.c.html
+
+Compile dengan:
+gcc uzapper.c -o uzapper
+
+Jalankan untuk menghapus log user tertentu:
+
+./uzapper user1
+
+======
+Ending
+======
+Covering Track adalah teknik untuk menghilangkan jejak di server Linux
+dengan menghapus atau memanipulasi log. Administrator harus memahami Teknik
+ini agar bisa mendeteksi dan mencegah aktivitas berbahaya.
+
+------------
+Suggestion :
+------------
+1) Menggunakan SIEM untuk menyimpan log di server terpisah.
+2) Menggunakan File Integrity Monitoring (FIM) untuk mendeteksi perubahan pada log.
+3) Mengaktifkan Kernel-Level Logging agar lebih sulit dimanipulasi.
+
+==========================================================
+Share and Learn. We can party in your system since 2015.
+
+Laggerghost & ICP Crew. Indonesia, 2015-2025.
+==========================================================
